@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VibeX - My Favourite Albums</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+           --primary: #661fe0;
+            --secondary: #cf4a3e;
+            --dark-bg: #001427;
+            --mid-bg: #001427;
+            --light-bg: #708d81;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --card-hover: rgba(255, 255, 255, 0.15);
+            --text-primary: #fff;
+            --text-muted: #b3b3b3;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg), var(--mid-bg), var(--light-bg));
+            color: var(--text-primary);
+        }
+
+        .app-container {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(0, 0, 0, 0.7);
+            height: 100vh;
+            position: fixed;
+            padding: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-item {
+            display: block;
+            margin: 15px 0;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        /* Main */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .section-title span {
+            color: var(--primary);
+        }
+
+        /* Cards */
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .card-title {
+            color: var(--primary);
+        }
+
+        .card-subtitle {
+            color: var(--text-muted);
+        }
+
+        /* Buttons */
+        .card-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .favorite-btn,
+        .play-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .favorite-btn {
+            background: black;
+            color: white;
+        }
+
+        .play-btn {
+            background: var(--secondary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="#" class="logo">🎵 VibeX</a>
+
+            <a href="index.html" class="nav-item">Home</a>
+            <a href="#" class="nav-item active">Albums</a>
+
+
+            <nav class="sidebar-nav">
+                <div class="nav-title">My Favourites</div>
+                <a href="favourites_songs.html" class="nav-item">
+                    <i class="fas fa-music"></i>
+                    <span>Songs</span>
+                </a>
+                <a href="favourites_albums.html" class="nav-item">
+                    <i class="fas fa-compact-disc"></i>
+                    <span>Albums</span>
+                </a>
+                <a href="favourites_artists.html" class="nav-item active">
+                    <i class="fas fa-microphone"></i>
+                    <span>Artists</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main -->
+        <main class="main-content">
+
+            <h2 class="section-title">My Favourite <span>Albums</span></h2>
+
+            <div id="favorites-container" class="favorites-grid">
+
+                <!-- ✅ Your Album -->
+                <div class="card featured" id="album-limitless">
+
+                    <img src="../images/Limitless.jpg" class="card-img" alt="Limitless">
+
+                    <div class="card-controls"></div>
+
+                    <div class="card-content">
+                        <h3 class="card-title">Limitless</h3>
+                        <p class="card-subtitle">Prem Dhillon</p>
+                    </div>
+
+                </div>
+                <div class="card featured" id="album-waymaker" data-type="album"
+                    data-search-term="Waymaker Navaan Sandhu">
+                    <img src="../images/way_maker.jpg" alt="Album Cover" class="card-img" />
+                    <div class="card-content">
+                        <h3 class="card-title">Waymaker</h3>
+                        <p class="card-subtitle">Navaan Sandhu</p>
+                    </div>
+                </div>
+
+
+                <div class="card featured" id="album-young-goat" data-type="album"
+                    data-search-term="Young Goat Cheema Y">
+                    <img src="../images/young_goat.jpg" alt="Album Cover" class="card-img" />
+                    <div class="card-content">
+                        <h3 class="card-title">Young Goat</h3>
+                        <p class="card-subtitle">Cheema Y</p>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+
+</body>
+
+</html>

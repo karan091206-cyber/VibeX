@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Albums - VibeX Music Portal</title>
+    <link rel="stylesheet" href="../css/albums.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        /* INLINE CSS FOR SEARCH AND FAVORITES FUNCTIONALITY (Adapted from artists page) */
+        :root {
+            --primary: #661fe0;
+            --secondary: #cf4a3e;
+            --dark-bg: #001427;
+            --mid-bg: #001427;
+            /* Assuming same bg */
+            --text-primary: #fff;
+            --text-secondary: #e2e2e2;
+            --text-muted: #b3b3b3;
+            --shadow-primary: 191, 6, 3;
+            --shadow-secondary: 244, 213, 141;
+        }
+
+        /* CARD MATCH HIGHLIGHT STYLES */
+        .card.matched {
+            border: 3px solid rgba(var(--shadow-secondary), 1);
+            box-shadow: 0 0 25px rgba(var(--shadow-secondary), 0.9),
+                0 0 10px rgba(var(--shadow-primary), 0.5);
+            transform: scale(1.05);
+            /* Make sure this doesn't conflict with existing hover effects */
+        }
+
+        /* FAVORITE BUTTON STYLES (Ensure consistency or use albums.css styles) */
+        /* .card-controls { ... } */
+        /* Assuming these are handled by albums.css */
+        /* .favorite-btn { ... } */
+        /* .favorite-btn i { ... } */
+        /* .favorite-btn:hover { ... } */
+
+        /* State for Favorited Item */
+        .card.favorited {
+            /* Example border, adjust as needed or use existing styles */
+            border: 2px solid var(--primary);
+        }
+
+        .card.favorited .favorite-btn i {
+            color: var(--primary);
+            /* Example: Highlight heart icon */
+            /* Add text-shadow if desired */
+        }
+
+        /* SEARCH BOX STYLES (for header) */
+        .search-box {
+            z-index: 1011;
+            /* Ensure it's above other elements */
+            position: relative;
+            max-width: 350px;
+            width: 300px;
+            /* Adjust width as needed */
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 10px 20px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-box:hover,
+        .search-box:focus-within {
+            box-shadow: 0 0 20px rgba(var(--shadow-secondary), 0.5),
+                inset 0 0 15px rgba(var(--shadow-secondary), 0.3);
+            /* transform: none; /* Keep or remove based on desired effect */
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .search-box input::placeholder {
+            /* Style placeholder text */
+            color: var(--text-muted);
+            opacity: 0.8;
+        }
+
+        .search-box>i.fa-search {
+            /* Target the search icon specifically */
+            color: var(--secondary);
+            margin-right: 8px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .search-box>i.fa-search:hover {
+            color: var(--primary);
+        }
+
+        /* SEARCH DROPDOWN STYLES */
+        .search-results-dropdown {
+            position: absolute;
+            top: calc(100% + 5px);
+            /* Position below search box with slight gap */
+            left: 0;
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            background: rgba(0, 20, 39, 0.95);
+            /* Slightly opaque dark background */
+            border: 1px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            z-index: 1010;
+            /* Below search box but above content */
+            display: none;
+            /* Hidden by default */
+            padding-top: 5px;
+            /* Space before first item */
+        }
+
+        /* Scrollbar styling for dropdown */
+        .search-results-dropdown::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .search-results-dropdown::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .search-results-dropdown::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+
+        .search-results-dropdown::-webkit-scrollbar-thumb:hover {
+            background-color: var(--secondary);
+        }
+
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            /* Adjusted padding */
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+            /* No border for the last item */
+        }
+
+        .dropdown-item:hover {
+            background: rgba(var(--shadow-primary), 0.15);
+            color: var(--primary);
+        }
+
+        .dropdown-item-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            /* Slightly rounded corners for album art */
+            object-fit: cover;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .dropdown-item-text {
+            flex-grow: 1;
+            overflow: hidden;
+            /* Prevent text overflow */
+            white-space: nowrap;
+        }
+
+        .dropdown-item-title {
+            font-weight: 600;
+            font-size: 1rem;
+            /* Adjusted size */
+            color: var(--text-primary);
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .dropdown-item:hover .dropdown-item-title {
+            color: var(--secondary);
+            /* Highlight title on hover */
+        }
+
+        .dropdown-item-subtitle {
+            font-size: 0.8rem;
+            /* Adjusted size */
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dropdown-item-play-btn {
+            background: linear-gradient(45deg, var(--primary), #8d0801);
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+            /* Slightly thinner border */
+            border-radius: 50%;
+            width: 32px;
+            /* Slightly smaller button */
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            box-shadow: 0 0 8px rgba(var(--shadow-primary), 0.7);
+            flex-shrink: 0;
+            /* Prevent button shrinking */
+        }
+
+        .dropdown-item-play-btn i {
+            font-size: 0.8rem;
+            /* Smaller icon */
+        }
+
+        .dropdown-item-play-btn:hover {
+            background: var(--secondary);
+            color: var(--dark-bg);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(var(--shadow-secondary), 0.9);
+        }
+
+        /* Style for playback message */
+        .playback-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 10000;
+            display: none;
+            /* Initially hidden */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Responsive adjustments for search box */
+        @media (max-width: 992px) {
+            .search-box {
+                width: 250px;
+                max-width: none;
+                /* Allow shrinking */
+            }
+
+            /* Footer adjustments if sidebar collapses - remove if not needed */
+            /* footer { margin-left: 0; width: 100%; } */
+        }
+
+        @media (max-width: 768px) {
+            .header-actions {
+                flex-direction: column-reverse;
+                /* Stack logo above search */
+                align-items: flex-end;
+                /* Align items to the right */
+                width: auto;
+                /* Let content determine width */
+                margin-top: 10px;
+            }
+
+            .search-box {
+                margin-right: 0;
+                margin-bottom: 10px;
+                width: 100%;
+                /* Take full width available in header */
+                max-width: 350px;
+                /* But limit max width */
+            }
+
+            .search-results-dropdown {
+                /* Adjust if search box position changes significantly */
+                /* left: 5%; width: 90%; */
+            }
+
+            .vibex-logo-container {
+                margin-bottom: 10px;
+                /* Space between logo and search */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .search-box {
+                max-width: 280px;
+                /* Further limit width on small screens */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <button id="sidebar-toggle-btn" class="sidebar-toggle-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="sidebar-logo">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-compact-disc"></i>
+                    <span>VibeX</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-title">Menu</div>
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="artists2.html" class="nav-item">
+                    <i class="fas fa-microphone"></i>
+                    <span>Artists</span>
+                </a>
+                <a href="albums3.html" class="nav-item active">
+                    <i class="fas fa-record-vinyl"></i>
+                    <span>Albums</span>
+                </a>
+            </nav>
+            <nav class="sidebar-nav">
+                <div class="nav-title">Library</div>
+                <a href="favourites_songs.html" class="nav-item">
+                    <i class="fas fa-music"></i>
+                    <span>Favourite Songs</span>
+                </a>
+                <a href="favourites_albums.html" class="nav-item">
+                    <i class="fas fa-compact-disc"></i>
+                    <span>Favourite Albums</span>
+                </a>
+                <a href="favourites_artists.html" class="nav-item">
+                    <i class="fas fa-microphone-alt"></i>
+                    <span>Favourite Artists</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-download"></i>
+                    <span>Downloads</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div class="header-content">
+                    <nav class="header-nav">
+                        <a href="index.html">Home</a>
+                        <a href="artists2.html">Artists</a> <a href="albums.html" class="active">Albums</a> <a
+                            href="about.html">About Us</a>
+                        <a href="contact.html">Contact Us</a>
+                        <a href="#">Features</a>
+                    </nav>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search Albums..." />
+                            <div id="searchResultsDropdown" class="search-results-dropdown">
+                            </div>
+                        </div>
+                        <div class="vibex-logo-container">
+                            <img src="../images/logo.jpg" alt="VibeX Logo" width="120" />
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title">Explore Albums</h1>
+                    <p class="hero-subtitle">Discover new albums from your favourite artists and genres.</p>
+                    <div class="hero-actions">
+                        <button id="featured-btn" class="btn"><i class="fas fa-star"></i> Featured Albums</button>
+                        <button id="all-albums-btn" class="btn active">All Albums</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">All <span>Albums</span></h2>
+                </div>
+                <div class="card-grid" id="album-grid">
+
+                    <div class="card featured" id="album-a-for-arjan2" data-type="album"
+                        data-search-term="A For Arjan2 Arjan Dhillon">
+                        <img src="../images/A_for_Arjan2.jpg" alt="Album Cover" class="card-img" />
+                        <div class="featured-star"><i class="fas fa-star"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">A For Arjan2</h3>
+                            <p class="card-subtitle">Arjan Dhillon</p>
+                        </div>
+                    </div>
+
+                    <div class="card featured" id="album-alpha" data-type="album"
+                        data-search-term="Alpha Jordan Sandhu">
+                        <img src="../images/alpha.jpg" alt="Album Cover" class="card-img" />
+                        <div class="featured-star"><i class="fas fa-star"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Alpha</h3>
+                            <p class="card-subtitle">Jordan Sandhu</p>
+                        </div>
+                    </div>
+
+                    <div class="card featured" id="album-limitless" data-type="album"
+                        data-search-term="Limitless Prem Dhillon">
+                        <img src="../images/Limitless.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Limitless</h3>
+                            <p class="card-subtitle">Prem Dhillon</p>
+                        </div>
+                    </div>
+
+                    <div class="card featured" id="album-waymaker" data-type="album"
+                        data-search-term="Waymaker Navaan Sandhu">
+                        <img src="../images/way_maker.jpg" alt="Album Cover" class="card-img" />
+                        <div class="featured-star"><i class="fas fa-star"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Waymaker</h3>
+                            <p class="card-subtitle">Navaan Sandhu</p>
+                        </div>
+                    </div>
+
+                    <div class="card featured" id="album-v8" data-type="album" data-search-term="V8 Jass Bajwa">
+                        <img src="../images/join_us.jpg" alt="Album Cover" class="card-img" />
+                        <div class="featured-star"><i class="fas fa-star"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">V8</h3>
+                            <p class="card-subtitle">Jass Bajwa</p>
+                        </div>
+                    </div>
+
+                    <div class="card featured" id="album-prime" data-type="album"
+                        data-search-term="Prime Nirvair Pannu">
+                        <img src="../images/prime.jpg" alt="Album Cover" class="card-img" />
+                        <div class="featured-star"><i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <div class="card featured" id="album-wonders" data-type="album"
+                        data-search-term="Wonders Nimrat Khaira">
+                        <img src="../images/wonders.jpg" alt="Album Cover" class="card-img" />
+                        <div class="featured-star"><i class="fas fa-star"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Wonders</h3>
+                            <p class="card-subtitle">Nimrat Khaira</p>
+                        </div>
+                    </div>
+
+                    <div class="card featured" id="album-young-goat" data-type="album"
+                        data-search-term="Young Goat Cheema Y">
+                        <img src="../images/young_goat.jpg" alt="Album Cover" class="card-img" />
+                        <div class="featured-star"><i class="fas fa-star"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Young Goat</h3>
+                            <p class="card-subtitle">Cheema Y</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-4-da-gang" data-type="album" data-search-term="4 Da Gang Prem Dhillon">
+                        <img src="../images/4_da_gang.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">4 Da Gang</h3>
+                            <p class="card-subtitle">Prem Dhillon</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-a-for-arjan" data-type="album"
+                        data-search-term="A For Arjan Arjan Dhillon">
+                        <img src="../images/A_for_Arjan.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">A For Arjan</h3>
+                            <p class="card-subtitle">Arjan Dhillon</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-sicario" data-type="album" data-search-term="Sicario Shubh">
+                        <img src="../images/sicario.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Sicario</h3>
+                            <p class="card-subtitle">Shubh</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-defcon" data-type="album" data-search-term="Defcon Tarsem Jassar">
+                        <img src="../images/defcon.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Defcon</h3>
+                            <p class="card-subtitle">Tarsem Jassar</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-warriors-honour" data-type="album"
+                        data-search-term="Warriors Honour Navaan Sandhu">
+                        <img src="../images/warriors_honour.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Warriors Honour</h3>
+                            <p class="card-subtitle">Navaan Sandhu</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-simpsons" data-type="album" data-search-term="Simpsons Cheema Y">
+                        <img src="../images/simpsons.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Simpsons</h3>
+                            <p class="card-subtitle">Cheema Y</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-chobar" data-type="album" data-search-term="Chobar Arjan Dhillon">
+                        <img src="../images/chobar.jpg" alt="Album Cover" class="card-img" />
+
+                    </div>
+
+
+
+                    <div class="card" id="album-cloud-9" data-type="album" data-search-term="Cloud 9 Cheema Y">
+                        <img src="../images/cloud9.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Cloud 9</h3>
+                            <p class="card-subtitle">Cheema Y</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-fy1" data-type="album" data-search-term="FY 1 Jordan Sandhu">
+                        <img src="../images/fy1.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">FY 1</h3>
+                            <p class="card-subtitle">Jordan Sandhu</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-yolo" data-type="album" data-search-term="YOLO Himmat Sandhu">
+                        <img src="../images/yolo.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">YOLO</h3>
+                            <p class="card-subtitle">Himmat Sandhu</p>
+                        </div>
+                    </div>
+                    <div class="card" id="album-timeless" data-type="album" data-search-term="Timeless Hustinder">
+                        <img src="../images/timeless.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Timeless</h3>
+                            <p class="card-subtitle">Hustinder</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-the-last-good-album" data-type="album"
+                        data-search-term="The Last Good Album Sharry Maan">
+                        <img src="../images/the_last_good.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">The Last Good Album</h3>
+                            <p class="card-subtitle">Sharry Maan</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-archives" data-type="album" data-search-term="Archives Prem Dhillon">
+                        <img src="../images/archives.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Archives</h3>
+                            <p class="card-subtitle">Prem Dhillon</p>
+                        </div>
+                    </div>
+                    <div class="card" id="album-two-of-a-kind" data-type="album"
+                        data-search-term="Two of a Kind Armaan Gill Arnaaz Gill">
+                        <img src="../images/two_of_a_kind.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Two of a Kind</h3>
+                            <p class="card-subtitle">Armaan Gill & Arnaaz Gill</p>
+                        </div>
+                    </div>
+                    <div class="card" id="album-age-19" data-type="album" data-search-term="Age 19 Jass Manak">
+                        <img src="../images/age19.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Age 19</h3>
+                            <p class="card-subtitle">Jass Manak</p>
+                        </div>
+                    </div>
+
+                    <div class="card featured" id="album-mahol" data-type="album" data-search-term="Mahol Hustinder">
+                        <img src="../images/raonak.jpg" alt="Album Cover" class="card-img" />
+                        <div class="featured-star"><i class="fas fa-star"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Mahol</h3>
+                            <p class="card-subtitle">Hustinder</p>
+                        </div>
+                    </div>
+                    <div class="card" id="album-dildarian" data-type="album" data-search-term="Dildarian Amrinder Gill">
+                        <img src="../images/dildariyan.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Dildarian</h3>
+                            <p class="card-subtitle">Amrinder Gill</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-pyass" data-type="album" data-search-term="Pyass Babbu Maan">
+                        <img src="../images/pyass.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Pyass</h3>
+                            <p class="card-subtitle">Babbu Maan</p>
+                        </div>
+                    </div>
+                    <div class="card" id="album-nostalgia" data-type="album" data-search-term="Nostalgia Hustinder">
+                        <img src="../images/nostalgia.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Nostalgia</h3>
+                            <p class="card-subtitle">Hustinder</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-pbx1" data-type="album" data-search-term="PBX 1 Sidhu Moosewala">
+                        <img src="../images/pbx1.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">PBX 1</h3>
+                            <p class="card-subtitle">Sidhu Moosewala</p>
+                        </div>
+                    </div>
+                    <div class="card" id="album-vehli-janta" data-type="album"
+                        data-search-term="Vehli Janta Kulbir Jhinjer">
+                        <img src="../images/vehli_janta.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Vehli Janta</h3>
+                            <p class="card-subtitle">Kulbir Jhinjer</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-aate-di-chidi" data-type="album"
+                        data-search-term="Aate Di Chidi Sharry Maan">
+                        <img src="../images/aate_di_chidi.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Aate Di Chidi</h3>
+                            <p class="card-subtitle">Sharry Maan</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-snitches" data-type="album"
+                        data-search-term="Snitches get Stitches Sidhu Moosewala">
+                        <img src="../images/pittal.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Snitches get Stitches</h3>
+                            <p class="card-subtitle">Sidhu Moosewala</p>
+                        </div>
+                    </div>
+                    <div class="card" id="album-patandar" data-type="album" data-search-term="Patandar Arjan Dhillon">
+                        <img src="../images/patandar.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Patandar</h3>
+                            <p class="card-subtitle">Arjan Dhillon</p>
+                        </div>
+
+                    </div>
+
+                    <div class="card" id="album-no-lookin-back" data-type="album"
+                        data-search-term="No Lookin Back Prem Dhillon">
+                        <img src="../images/no_lookin_back.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">No Lookin Back</h3>
+                            <p class="card-subtitle">Prem Dhillon</p>
+                        </div>
+
+                    </div>
+
+                    <div class="card" id="album-magestic" data-type="album"
+                        data-search-term="Magestic Majestic Nirvair Pannu"> <img src="../images/majestic.jpg"
+                            alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Magestic</h3>
+                            <p class="card-subtitle">Nirvair Pannu</p>
+                        </div>
+
+                    </div>
+
+                    <div class="card" id="album-judaa-3" data-type="album" data-search-term="Judaa 3 Amrinder Gill">
+                        <img src="../images/judaa3.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Judaa 3</h3>
+                            <p class="card-subtitle">Amrinder Gill</p>
+                        </div>
+
+                    </div>
+
+                    <div class="card" id="album-new-beginnings" data-type="album"
+                        data-search-term="New Beginnings Dilpreet Dhillon">
+                        <img src="../images/new_beginnings.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">New Beginnings</h3>
+                            <p class="card-subtitle">Dilpreet Dhillon</p>
+                        </div>
+                        >
+                    </div>
+
+                    <div class="card" id="album-entry-time" data-type="album" data-search-term="Entry Time Dulla">
+                        <img src="../images/entry_time.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Entry Time</h3>
+                            <p class="card-subtitle">Dulla</p>
+                        </div>
+
+                    </div>
+
+                    <div class="card" id="album-keep-it-gangsta" data-type="album"
+                        data-search-term="Keep it Gangsta Wazir Patar">
+                        <img src="../images/keep_it_gangsta.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Keep it Gangsta</h3>
+                            <p class="card-subtitle">Wazir Patar</p>
+                        </div>
+
+                    </div>
+
+                    <div class="card" id="album-saroor" data-type="album" data-search-term="Saroor Arjan Dhillon">
+                        <img src="../images/saroor.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Saroor</h3>
+                            <p class="card-subtitle">Arjan Dhillon</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-making-memories" data-type="album"
+                        data-search-term="Making Memories Karan Aujla">
+                        <img src="../images/making_memories.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Making Memories</h3>
+                            <p class="card-subtitle">Karan Aujla</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="album-bhadauria" data-type="album" data-search-term="Bhadauria Hustinder">
+                        <img src="../images/bhadauria.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Bhadauria</h3>
+                            <p class="card-subtitle">Hustinder</p>
+                        </div>
+                    </div>
+                    <div class="card" id="album-still" data-type="album" data-search-term="Still Sharry Maan">
+                        <img src="../images/still.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Still</h3>
+                            <p class="card-subtitle">Sharry Maan</p>
+                        </div>
+                    </div>
+                    <div class="card" id="album-turbanator" data-type="album"
+                        data-search-term="Turbanator Tarsem Jassar">
+                        <img src="../images/turbanator.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Turbanator</h3>
+                            <p class="card-subtitle">Tarsem Jassar</p>
+                        </div>
+
+                    </div>
+
+                    <div class="card" id="album-ghost" data-type="album" data-search-term="Ghost Diljit Dosanjh">
+                        <img src="../images/ghost.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">Ghost</h3>
+                            <p class="card-subtitle">Diljit Dosanjh</p>
+                        </div>
+                    </div>
+                    <div class="card" id="album-the-revolution" data-type="album"
+                        data-search-term="The Revolution Arjan Dhillon">
+                        <img src="../images/the_revolution.jpg" alt="Album Cover" class="card-img" />
+                        <div class="card-content">
+                            <h3 class="card-title">The Revolution</h3>
+                            <p class="card-subtitle">Arjan Dhillon</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="playback-message" id="playbackMessage"></div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>About Vibex</h3>
+                    <p>Vibex is your ultimate music destination to discover new artists, stream music, and get tickets
+                        to the hottest events.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-spotify"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="artists2.html">Artists</a></li>
+                        <li><a href="albums3.html">Albums</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="#">Events</a></li>
+                        <li><a href="#">News</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Top Genres</h3>
+                    <ul>
+                        <li><a href="#">Pop</a></li>
+                        <li><a href="#">Rock</a></li>
+                        <li><a href="#">Hip Hop</a></li>
+                        <li><a href="#">Electronic</a></li>
+                        <li><a href="#">Jazz</a></li>
+                        <li><a href="#">R&B</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to our newsletter for updates on new releases, events, and exclusive content.</p>
+                    <div class="newsletter">
+                        <form action="#">
+                            <input type="email" placeholder="Your Email Address" required>
+                            <button type="submit">Subscribe</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; 2026 VibeX Music Portal. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

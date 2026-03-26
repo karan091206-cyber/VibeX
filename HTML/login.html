@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibeX Login</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+
+  background: linear-gradient(-45deg, #0f0f1a, #1a1a2e, #6a11cb, #ff416c);
+  background-size: 400% 400%;
+  animation: gradientBG 10s ease infinite;
+}
+
+/* Animation */
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 100%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 0%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Container */
+.login-container {
+  display: flex;
+  width: 850px;
+  height: 500px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #1a1a2e;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+}
+
+/* Left Side (Branding) */
+.login-left {
+  flex: 1;
+  background: linear-gradient(135deg, #6a11cb, #ff416c);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  padding: 40px;
+}
+
+.login-left h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.login-left p {
+  opacity: 0.9;
+  text-align: center;
+}
+
+/* Right Side (Form) */
+.login-right {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-right h2 {
+  color: #fff;
+  margin-bottom: 25px;
+}
+
+/* Input Fields */
+.input-box {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 12px 40px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: #2a2a40;
+  color: #fff;
+}
+
+.input-box i {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  color: #aaa;
+}
+
+/* Button */
+.login-btn {
+  background: linear-gradient(135deg, #6a11cb, #ff416c);
+  border: none;
+  padding: 12px;
+  border-radius: 25px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  opacity: 0.85;
+}
+
+/* Extra Links */
+.extra {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.extra a {
+  color: #aaa;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.extra a:hover {
+  color: #fff;
+}
+
+/* Vibex Logo */
+.logo {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  font-size: 32px;
+  color: #f241ff;
+  font-weight: bold;
+}
+
+.logo i {
+  margin-right: 8px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="logo">
+  <i class="fas fa-record-vinyl"></i> VibeX
+</div>
+
+<div class="login-container">
+
+  <!-- Left Side -->
+  <div class="login-left">
+    <h1>Welcome</h1>
+    <p>Stream your vibe. Discover music. Feel the beat.</p>
+  </div>
+
+  <!-- Right Side -->
+  <div class="login-right">
+    <h2>Login</h2>
+
+    <form action="#">
+      
+      <div class="input-box">
+        <i class="fas fa-envelope"></i>
+        <input type="email" placeholder="Email" required>
+      </div>
+
+      <div class="input-box">
+        <i class="fas fa-lock"></i>
+        <input type="password" placeholder="Password" required>
+      </div>
+
+      <button class="login-btn">Login</button>
+
+      <div class="extra">
+        <p><a href="#">Forgot Password?</a></p>
+        <p><a href="#">Create Account</a></p>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+</body>
+</html>
