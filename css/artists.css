@@ -247,9 +247,9 @@
             margin-right: 8px;
         }
 
-        .tunex-logo-container {
-            width: 80px;
-            height: 80px;
+        .vibex-logo-container {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             overflow: hidden;
             display: flex;
@@ -259,15 +259,15 @@
             box-shadow: 0 0 10px rgba(var(--shadow-secondary), 0.5);
         }
 
-        .tunex-logo-container:hover {
+        .vibex-logo-container:hover {
             transform: scale(1.1);
             box-shadow: 0 0 25px rgba(var(--shadow-secondary), 0.8);
         }
 
-        .tunex-logo-container img {
+        .vibex-logo-container img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: fill;
         }
         
         /* Hero Section */

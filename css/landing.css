@@ -173,8 +173,9 @@
 
         /* Fade-in Animation for sections */
         .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
+            opacity: 1; 
+            /* transform: translateY(20px); */
+            transform: none;
             transition: opacity 1s ease-out, transform 1s ease-out;
         }
 
